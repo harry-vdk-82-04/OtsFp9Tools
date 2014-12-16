@@ -29,6 +29,12 @@ namespace Ots.fp9
                 Row = pos.Row;
             }
 
+            public Pos(int col, int row)
+            {
+                Col = col;
+                Row = row;
+            }
+
             public override string ToString()
             {
                 return string.Format("Col={0}, Row={1}", Col, Row);
@@ -92,6 +98,18 @@ namespace Ots.fp9
             public Location(Pos pos)
             {
                 LocPos = new Pos(pos);
+                Elevation = 8;
+                MobilityRating = 7;
+                CoverRating = 7;
+                VisibilityRating = 0;
+                Defensibility = 0;
+                Reach = 0;
+                Visibility = 3;
+                ObstacleCode = "0";
+                RoadCode = "";
+                PlaceName = "";
+                SetupOwnership = -1;
+                Description = "Elev 8, Forest, ";
             }
 
             public Location(Pos pos, Location source)
@@ -123,6 +141,18 @@ namespace Ots.fp9
                 for (var col = Min.Col; col <= Max.Col; col++)
                 {
                     Square[col] = new Location[Max.Row + 1];
+                }
+            }
+
+            public void FillWithDefaults()
+            {
+                var pos = new Map.Pos();
+                for (pos.Col = Min.Col; pos.Col <= Max.Col; pos.Col++)
+                {
+                    for (pos.Row = Min.Row; pos.Row <= Max.Row; pos.Row++)
+                    {
+                        if (Square[pos.Col][pos.Row] == null) Square[pos.Col][pos.Row] = new Location(pos);
+                    }
                 }
             }
         }

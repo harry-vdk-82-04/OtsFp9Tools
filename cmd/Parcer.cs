@@ -61,6 +61,14 @@ namespace Ots.cmd
                             if (string.IsNullOrEmpty(param)) break;
                             if (int.TryParse(param, out intVar)) command.FilterRange.Max.Row = intVar;
                             break;
+                        case "/newmaxcol":
+                            if (string.IsNullOrEmpty(param)) break;
+                            if (int.TryParse(param, out intVar)) command.NewMax.Col = intVar;
+                            break;
+                        case "/newmaxrow":
+                            if (string.IsNullOrEmpty(param)) break;
+                            if (int.TryParse(param, out intVar)) command.NewMax.Row = intVar;
+                            break;
                         default:
                             nrOfOptions--;
                             break;
@@ -88,6 +96,9 @@ namespace Ots.cmd
             Console.Out.WriteLine("[/RangeMinRow=<>]");
             Console.Out.WriteLine("[/RangeMaxCol=<>]");
             Console.Out.WriteLine("[/RangeMaxRow=<>]");
+            Console.Out.WriteLine("");
+            Console.Out.WriteLine("[/NewMaxCol=<>]");
+            Console.Out.WriteLine("[/NewMaxRow=<>]");
         }
     }
 }
