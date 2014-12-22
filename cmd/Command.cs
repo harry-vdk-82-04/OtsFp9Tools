@@ -89,8 +89,12 @@ namespace Ots.cmd
                      mapPos.Row <= mapRange.Max.Row && impPos.Row <= impRange.Max.Row;
                      mapPos.Row++, impPos.Row++)
                 {
-                    map.Square[mapPos.Col][mapPos.Row] = new Map.Location(mapPos, imp.Square[impPos.Col][impPos.Row]);
-                    locs++;
+                    if (map.WithinRange(mapPos) &&
+                        imp.WithinRange(impPos))
+                    {
+                        map.Square[mapPos.Col][mapPos.Row] = new Map.Location(mapPos, imp.Square[impPos.Col][impPos.Row]);
+                        locs++;
+                    }
                 }
             }
             return locs != 0;
@@ -100,10 +104,10 @@ namespace Ots.cmd
         
         {
             var range = new Map.Range();
-            range.Min.Col = Math.Max((filter.Min.Col != 0 ? filter.Min.Col : map.Min.Col) + offset.Col, map.Min.Col);
-            range.Max.Col = Math.Min((filter.Max.Col != 0 ? filter.Max.Col : map.Max.Col) + offset.Col, map.Max.Col);
-            range.Min.Row = Math.Max((filter.Min.Row != 0 ? filter.Min.Row : map.Min.Row) + offset.Row, map.Min.Row);
-            range.Max.Row = Math.Min((filter.Max.Row != 0 ? filter.Max.Row : map.Max.Row) + offset.Row, map.Max.Row);
+            range.Min.Col = Math.Max((filter.Min.Col != 0 ? filter.Min.Col : map.Min.Col) + offset.Col, map.Min.Col + offset.Col);
+            range.Max.Col = Math.Min((filter.Max.Col != 0 ? filter.Max.Col : map.Max.Col) + offset.Col, map.Max.Col + offset.Col);
+            range.Min.Row = Math.Max((filter.Min.Row != 0 ? filter.Min.Row : map.Min.Row) + offset.Row, map.Min.Row + offset.Row);
+            range.Max.Row = Math.Min((filter.Max.Row != 0 ? filter.Max.Row : map.Max.Row) + offset.Row, map.Max.Row + offset.Row);
             return range;
         }
     }

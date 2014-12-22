@@ -158,6 +158,7 @@ namespace Ots.fp9
         }
 
         public const int EndOfOtsMarker = 0x29A;
+        public const int Fp9VersionId = 0x12E;
         public int VersionId { get; set; }
         public string Name { get; set; }
         public int MaxLayers { get; set; }
@@ -172,7 +173,7 @@ namespace Ots.fp9
 
         public override string ToString()
         {
-            return string.Format("Name={0}, Creator={1}, Map={2}", Name, CreatorName, MapLocations);
+            return string.Format("Name={0}, Creator={1}, IsOk={2}, Map={3}", Name, CreatorName, IsOk, MapLocations);
         }
 
         public static class Io
@@ -185,6 +186,7 @@ namespace Ots.fp9
                     using (var reader = new BinaryReader(stream, Encoding.Unicode))
                     {
                         map.VersionId = reader.ReadInt32();
+                        if (Fp9VersionId != map.VersionId) return map;
                         map.Name = ReadString(reader);
                         map.MapLocations = new Locations(ReadRange(reader));
                         map.MaxLayers = reader.ReadInt32();
@@ -193,14 +195,7 @@ namespace Ots.fp9
                         map.ModifiedDate = ReadDateTime(reader);
                         map.CreatorPw = ReadString(reader);
                         map.Description = ReadString(reader);
-                        var pos = new Pos();
-                        for (pos.Col = map.MapLocations.Min.Col; pos.Col <= map.MapLocations.Max.Col; pos.Col++)
-                        {
-                            for (pos.Row = map.MapLocations.Min.Row; pos.Row <= map.MapLocations.Max.Row; pos.Row++)
-                            {
-                                map.MapLocations.Square[pos.Col][pos.Row] = ReadLocation(reader, pos);
-                            }
-                        }
+                        ReadLocations(reader, map);
                         map.IsOk = (reader.ReadInt32() == EndOfOtsMarker);
                         Console.Out.WriteLine("- Read:"+ Path.GetFileName(filename) +" = OK.");
                     }
@@ -229,6 +224,18 @@ namespace Ots.fp9
                     Max = { Col = reader.ReadInt32(), Row = reader.ReadInt32() }
                 };
                 return range;
+            }
+
+            private static void ReadLocations(BinaryReader reader, Map map)
+            {
+                var pos = new Pos();
+                for (pos.Col = map.MapLocations.Min.Col; pos.Col <= map.MapLocations.Max.Col; pos.Col++)
+                {
+                    for (pos.Row = map.MapLocations.Min.Row; pos.Row <= map.MapLocations.Max.Row; pos.Row++)
+                    {
+                        map.MapLocations.Square[pos.Col][pos.Row] = ReadLocation(reader, pos);
+                    }
+                }
             }
 
             private static Location ReadLocation(BinaryReader reader, Pos pos)

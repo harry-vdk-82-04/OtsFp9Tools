@@ -89,16 +89,16 @@ namespace Ots.cmd
             Console.Out.WriteLine("/filename=<base filename>");
             Console.Out.WriteLine("/import=<import filename>");
             Console.Out.WriteLine("");
-            Console.Out.WriteLine("[/OffsetCol=<>]");
-            Console.Out.WriteLine("[/OffsetRow=<>]");
+            Console.Out.WriteLine("[/OffsetCol=<int>]");
+            Console.Out.WriteLine("[/OffsetRow=<int>]");
             Console.Out.WriteLine("");
-            Console.Out.WriteLine("[/RangeMinCol=<>]");
-            Console.Out.WriteLine("[/RangeMinRow=<>]");
-            Console.Out.WriteLine("[/RangeMaxCol=<>]");
-            Console.Out.WriteLine("[/RangeMaxRow=<>]");
+            Console.Out.WriteLine("[/RangeMinCol=<int>]");
+            Console.Out.WriteLine("[/RangeMinRow=<int>]");
+            Console.Out.WriteLine("[/RangeMaxCol=<int>]");
+            Console.Out.WriteLine("[/RangeMaxRow=<int>]");
             Console.Out.WriteLine("");
-            Console.Out.WriteLine("[/NewMaxCol=<>]");
-            Console.Out.WriteLine("[/NewMaxRow=<>]");
+            Console.Out.WriteLine("[/NewMaxCol=<int>]");
+            Console.Out.WriteLine("[/NewMaxRow=<int>]");
         }
     }
 }
