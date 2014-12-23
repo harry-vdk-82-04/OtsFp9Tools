@@ -53,8 +53,8 @@ namespace Ots.cmd
         private bool ResizeMap(Map map, Map.Pos newMax)
         {
             if (map.IsOk == false) return false;
-            if (newMax.Col < map.MapLocations.Min.Col) return false;
-            if (newMax.Row < map.MapLocations.Min.Row) return false;
+            if (newMax.Col < map.MapLocations.Min.Col && newMax.Col != 0) return false;
+            if (newMax.Row < map.MapLocations.Min.Row && newMax.Row != 0) return false;
             if (newMax.Col == map.MapLocations.Max.Col 
              && newMax.Row == map.MapLocations.Max.Row) return false;
             var newRange = new Map.Range(map.MapLocations.Min, new Map.Pos(newMax.Col != 0 ? newMax.Col : map.MapLocations.Max.Col, newMax.Row != 0 ? newMax.Row : map.MapLocations.Max.Row));
