@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Ots.fp9;
 
 namespace Ots.cmd
 {
+    using fp9;
+    using draw;
+
     public class Command
     {
         public enum CmdType
         {
             IsUnknown = 0,
             IsImport = 1,
+            IsDrawMapValues = 2,
         };
 
         public CmdType Cmd { get; set; }
@@ -21,6 +24,7 @@ namespace Ots.cmd
         public Map.Pos NewMax { get; set; }
         public String Filename { get; set; }
         public String ImportFile { get; set; }
+        public String DrawFile { get; set; }
 
         public Command()
         {
@@ -46,6 +50,18 @@ namespace Ots.cmd
                         Map.Io.Write(Filename, map);
                     }
                 }
+                    break;
+                case CmdType.IsDrawMapValues:
+                    {
+                        var map = Map.Io.Read(Filename);
+                        var text = new MapValues();
+                        using (var canvas = new Canvas(Filename, DrawFile))
+                        {
+                            text.DrawHexnumbers(canvas.Graphics, map);
+                            text.DrawMapValues(canvas.Graphics, map);
+                            canvas.Save();
+                        }
+                    }
                     break;
             }
         }

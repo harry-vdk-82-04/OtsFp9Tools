@@ -23,6 +23,15 @@ namespace Ots.cmd
                 {
                     doPrintHelp = true;
                 }
+                if (split.GetLength(0) <= 1)
+                {
+                    switch (arg)
+                    {
+                        case "/drawmapvalues":
+                            command.Cmd = Command.CmdType.IsDrawMapValues;
+                            break;
+                    }
+                }
                 if (split.GetLength(0) == 2)
                 {
                     var cmd = split[0].ToLower();
@@ -32,6 +41,12 @@ namespace Ots.cmd
                     {
                         case "/filename":
                             command.Filename = param;
+                            break;
+                        case "/drawmapvalues":
+                            command.Cmd = Command.CmdType.IsDrawMapValues;
+                            break;
+                        case "/drawfilename":
+                            command.DrawFile = param;
                             break;
                         case "/import":
                             command.Cmd = Command.CmdType.IsImport;
@@ -86,7 +101,10 @@ namespace Ots.cmd
         private static void PrintHelpToStdOut()
         {
             Console.Out.WriteLine("Options:");
+            Console.Out.WriteLine("/?");
             Console.Out.WriteLine("/filename=<base filename>");
+            Console.Out.WriteLine("");
+            Console.Out.WriteLine("Used for merging mapvalues");
             Console.Out.WriteLine("/import=<import filename>");
             Console.Out.WriteLine("");
             Console.Out.WriteLine("[/OffsetCol=<int>]");
@@ -99,6 +117,10 @@ namespace Ots.cmd
             Console.Out.WriteLine("");
             Console.Out.WriteLine("[/NewMaxCol=<int>]");
             Console.Out.WriteLine("[/NewMaxRow=<int>]");
+            Console.Out.WriteLine("");
+            Console.Out.WriteLine("Used for drawing mapvalues");
+            Console.Out.WriteLine("/drawmapvalues");
+            Console.Out.WriteLine("[/drawfilename=<optional filename>]");
         }
     }
 }
