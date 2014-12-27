@@ -180,6 +180,7 @@ namespace Ots.fp9
         {
             public static Map Read(string filename)
             {
+                filename = Path.ChangeExtension(filename, ".fp9");
                 var map = new Map();
                 using (var stream = File.OpenRead(filename))
                 {
@@ -261,6 +262,7 @@ namespace Ots.fp9
 
             public static void Write(string filename, Map map)
             {
+                filename = Path.ChangeExtension(filename, ".fp9");
                 if (File.Exists(filename)) File.Delete(filename);
                 using (var stream = File.OpenWrite(filename))
                 {

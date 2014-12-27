@@ -20,13 +20,13 @@ namespace Ots.draw
 
         public bool IsOpen { get { return _image != null && Graphics != null; } }
 
-        public Canvas(String filename, String drawFile)
+        public Canvas(String filename, String drawFilename, String drawExtension)
         {
             Filename = filename;
-            PngFile = Path.ChangeExtension(filename, ".png");
-            DrawFile = (string.IsNullOrEmpty(drawFile)
-                ? Path.ChangeExtension(filename, ".png")
-                : drawFile);
+            PngFile = Path.ChangeExtension(filename, drawExtension);
+            DrawFile = (string.IsNullOrEmpty(drawFilename)
+                ? Path.ChangeExtension(filename, drawExtension)
+                : drawFilename);
             Open();
         }
 

@@ -11,58 +11,50 @@ namespace Ots.cmd
 
     public class Command
     {
-        public enum CmdType
-        {
-            IsUnknown = 0,
-            IsImport = 1,
-            IsDrawMapValues = 2,
-        };
-
-        public CmdType Cmd { get; set; }
+        public bool IsImport { get; set; }
+        public bool IsDrawMapValues { get; set; }
         public Map.Pos OffsetPos { get; set; }
         public Map.Range FilterRange { get; set; }
         public Map.Pos NewMax { get; set; }
         public String Filename { get; set; }
         public String ImportFile { get; set; }
-        public String DrawFile { get; set; }
+        public String DrawFilename { get; set; }
+        public String DrawExtension { get; set; }
 
         public Command()
         {
-            Cmd = CmdType.IsUnknown;
+            IsImport = false;
+            IsDrawMapValues = false;
             OffsetPos = new Map.Pos();
             NewMax = new Map.Pos();
             FilterRange = new Map.Range();
             Filename = string.Empty;
             ImportFile = string.Empty;
+            DrawFilename = string.Empty;
+            DrawExtension = ".png";
         }
 
         public void Run()
         {
-            switch (Cmd)
+            var map = Map.Io.Read(Filename);
+            if (IsImport)
             {
-                case CmdType.IsImport:
+                var imp = Map.Io.Read(ImportFile);
+                ResizeMap(map, NewMax);
+                if (MergeFrom(map, imp, OffsetPos, FilterRange))
                 {
-                    var map = Map.Io.Read(Filename);
-                    var imp = Map.Io.Read(ImportFile);
-                    ResizeMap(map, NewMax);
-                    if (MergeFrom(map, imp, OffsetPos, FilterRange))
-                    {
-                        Map.Io.Write(Filename, map);
-                    }
+                    Map.Io.Write(Filename, map);
                 }
-                    break;
-                case CmdType.IsDrawMapValues:
-                    {
-                        var map = Map.Io.Read(Filename);
-                        var text = new MapValues();
-                        using (var canvas = new Canvas(Filename, DrawFile))
-                        {
-                            text.DrawHexnumbers(canvas.Graphics, map);
-                            text.DrawMapValues(canvas.Graphics, map);
-                            canvas.Save();
-                        }
-                    }
-                    break;
+            }
+            if (IsDrawMapValues)
+            {
+                var text = new MapValues();
+                using (var canvas = new Canvas(Filename, DrawFilename, DrawExtension))
+                {
+                    text.DrawHexnumbers(canvas.Graphics, map);
+                    text.DrawMapValues(canvas.Graphics, map);
+                    canvas.Save();
+                }
             }
         }
 

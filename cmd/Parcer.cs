@@ -28,7 +28,7 @@ namespace Ots.cmd
                     switch (arg)
                     {
                         case "/drawmapvalues":
-                            command.Cmd = Command.CmdType.IsDrawMapValues;
+                            command.IsDrawMapValues = true;
                             break;
                     }
                 }
@@ -43,13 +43,16 @@ namespace Ots.cmd
                             command.Filename = param;
                             break;
                         case "/drawmapvalues":
-                            command.Cmd = Command.CmdType.IsDrawMapValues;
+                            command.IsDrawMapValues = true;
                             break;
                         case "/drawfilename":
-                            command.DrawFile = param;
+                            command.DrawFilename = param;
+                            break;
+                        case "/drawextension":
+                            command.DrawExtension = param;
                             break;
                         case "/import":
-                            command.Cmd = Command.CmdType.IsImport;
+                            command.IsImport = true;
                             command.ImportFile = param;
                             break;
                         case "/offsetcol":
@@ -121,6 +124,7 @@ namespace Ots.cmd
             Console.Out.WriteLine("Used for drawing mapvalues");
             Console.Out.WriteLine("/drawmapvalues");
             Console.Out.WriteLine("[/drawfilename=<optional filename>]");
+            Console.Out.WriteLine("[/drawextension=<optional extension>]");
         }
     }
 }
