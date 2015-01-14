@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,56 @@ namespace Ots.cmd
 
     public class Command
     {
+
+        public class ExtractMap
+        {
+            public String Filename { get; set; }
+            public Map.Pos StartPos { get; set; }
+            public Map.Pos MapSize { get; set; }
+
+            public ExtractMap()
+            {
+                Filename = string.Empty;
+                StartPos = new Map.Pos();
+                MapSize = new Map.Pos() { Col = 46, Row = 30 };
+            }
+
+            public ExtractMap(ExtractMap source)
+            {
+                Filename = source.Filename;
+                StartPos = new Map.Pos(source.StartPos);
+                MapSize = new Map.Pos(source.MapSize);
+            }
+
+            public Map.Pos GetOffset()
+            {
+                var offset = new Map.Pos()
+                {
+                    Col = -StartPos.Col,
+                    Row = -StartPos.Row
+                };
+                return offset;
+            }
+
+            public Map.Range GetFilter()
+            {
+                var filter = new Map.Range
+                {
+                    Min = new Map.Pos(StartPos),
+                    Max = new Map.Pos()
+                    {
+                        Col = StartPos.Col + MapSize.Col - 1,
+                        Row = StartPos.Row + MapSize.Row - 1
+                    }
+                };
+                return filter;
+            }
+
+            public override string ToString()
+            {
+                return string.Format("Filename={0}, Start={1}, MapSize={2}", Filename, StartPos, MapSize);
+            }
+        }
         public bool IsImport { get; set; }
         public bool IsDrawMapValues { get; set; }
         public Map.Pos OffsetPos { get; set; }
@@ -20,6 +71,9 @@ namespace Ots.cmd
         public String ImportFile { get; set; }
         public String DrawFilename { get; set; }
         public String DrawExtension { get; set; }
+
+        private readonly List<ExtractMap> _extractMaps = new List<ExtractMap>();
+        public List<ExtractMap> ExtractMaps {get { return _extractMaps; } }
 
         public Command()
         {
@@ -54,6 +108,32 @@ namespace Ots.cmd
                     text.DrawHexnumbers(canvas.Graphics, map);
                     text.DrawMapValues(canvas.Graphics, map);
                     canvas.Save();
+                }
+            }
+            if (ExtractMaps.Count != 0)
+            {
+                using (var source = new Canvas(Filename))
+                {
+                    source.Open();
+                    if (source.IsOpen)
+                    {
+                        foreach (var extractMap in ExtractMaps)
+                        {
+                            var rect = source.GetRectangle(extractMap.StartPos, extractMap.MapSize, source.MaxSize);
+                            using (var canvas = Canvas.Clone(source, extractMap.Filename, rect))
+                            {
+                                if (canvas.Save())
+                                {
+                                    var exp = Map.Io.Read(Filename);
+                                    ResizeMap(exp, extractMap.MapSize);
+                                    if (MergeFrom(exp, map, extractMap.GetOffset(), new Map.Range()))
+                                    {
+                                        //Map.Io.Write(extractMap.Filename, exp);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

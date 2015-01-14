@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
+using Ots.fp9;
 
 namespace Ots.cmd
 {
@@ -11,6 +12,7 @@ namespace Ots.cmd
     {
         public static Command ReadCommandLine()
         {
+            var extractMap = new Command.ExtractMap();
             var separator = new[] { '=' };
             var command = new Command();
             var arguments = Environment.GetCommandLineArgs();
@@ -55,6 +57,14 @@ namespace Ots.cmd
                             command.IsImport = true;
                             command.ImportFile = param;
                             break;
+                        case "/extractmap":
+                            if (string.IsNullOrEmpty(extractMap.Filename) == false)
+                            {
+                                command.ExtractMaps.Add(extractMap);
+                                extractMap = new Command.ExtractMap(extractMap);
+                            }
+                            extractMap.Filename = param;
+                            break;
                         case "/offsetcol":
                             if (string.IsNullOrEmpty(param)) break;
                             if (int.TryParse(param, out intVar)) command.OffsetPos.Col = intVar;
@@ -87,12 +97,32 @@ namespace Ots.cmd
                             if (string.IsNullOrEmpty(param)) break;
                             if (int.TryParse(param, out intVar)) command.NewMax.Row = intVar;
                             break;
+                        case "/startcol":
+                            if (string.IsNullOrEmpty(param)) break;
+                            if (int.TryParse(param, out intVar)) extractMap.StartPos.Col = intVar;
+                            break;
+                        case "/startrow":
+                            if (string.IsNullOrEmpty(param)) break;
+                            if (int.TryParse(param, out intVar)) extractMap.StartPos.Row = intVar;
+                            break;
+                        case "/nrofcols":
+                            if (string.IsNullOrEmpty(param)) break;
+                            if (int.TryParse(param, out intVar)) extractMap.MapSize.Col = intVar;
+                            break;
+                        case "/nrofrows":
+                            if (string.IsNullOrEmpty(param)) break;
+                            if (int.TryParse(param, out intVar)) extractMap.MapSize.Row = intVar;
+                            break;
                         default:
                             nrOfOptions--;
                             break;
                     }
                     nrOfOptions++;
                 }
+            }
+            if (string.IsNullOrEmpty(extractMap.Filename) == false)
+            {
+                command.ExtractMaps.Add(extractMap);
             }
             if (doPrintHelp || nrOfOptions == 0)
             {
@@ -125,6 +155,13 @@ namespace Ots.cmd
             Console.Out.WriteLine("/drawmapvalues");
             Console.Out.WriteLine("[/drawfilename=<optional filename>]");
             Console.Out.WriteLine("[/drawextension=<optional extension>]");
+            Console.Out.WriteLine("");
+            Console.Out.WriteLine("Used for extracting map[s]");
+            Console.Out.WriteLine("/ExtractMap=<extract to filename>");
+            Console.Out.WriteLine("/StartCol=<int>");
+            Console.Out.WriteLine("/StartRow=<int>");
+            Console.Out.WriteLine("/NrOfCols=<int>, default=46");
+            Console.Out.WriteLine("/NrOfRows=<int>, default=30");
         }
     }
 }

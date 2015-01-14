@@ -8,7 +8,7 @@ using System.Drawing;
 
 namespace Ots.draw
 {
-    public class Canvas : IDisposable
+    public class Canvas : Tile2Image, IDisposable
     {
         public String Filename { get; set; }
         public String PngFile { get; set; }
@@ -18,7 +18,19 @@ namespace Ots.draw
         private Bitmap _bitmap;
         public Graphics Graphics { get; protected set; }
 
+        public Size MaxSize
+        {
+            get { return _bitmap != null ? _image.Size : new Size(0,0); }
+        }
+
         public bool IsOpen { get { return _image != null && Graphics != null; } }
+
+        public Canvas(String filename)
+        {
+            Filename = filename;
+            PngFile = Path.ChangeExtension(filename, ".png");
+            DrawFile = Path.ChangeExtension(filename, ".png");
+        }
 
         public Canvas(String filename, String drawFilename, String drawExtension)
         {
@@ -41,20 +53,46 @@ namespace Ots.draw
                 fs.Close();
                 _bitmap = new Bitmap(_image);
                 Graphics = Graphics.FromImage(_bitmap);
+                Console.Out.WriteLine("- Read:" + Path.GetFileName(PngFile) + " = OK.");
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Console.Out.WriteLine("- Read:" + Path.GetFileName(PngFile) + " = " + ex.Message);
             }
             return IsOpen;
         }
 
+        public static Canvas Clone(Canvas source, String filename, RectangleF rect)
+        {
+            var canvas = new Canvas(filename);
+            try
+            {
+                canvas._bitmap = source._bitmap.Clone(rect, source._bitmap.PixelFormat);
+                Console.Out.WriteLine("- Clone:" + Path.GetFileName(filename) + " = OK.");
+            }
+            catch (Exception ex)
+            {
+                Console.Out.WriteLine("- Clone:" + Path.GetFileName(filename) + " = " + ex.Message);
+            }
+            return canvas;
+        }
+
         public bool Save()
         {
-            if (IsOpen)
+            if (_bitmap != null)
             {
-                _bitmap.Save(DrawFile, GetFormat());
+                try
+                {
+                    _bitmap.Save(DrawFile, GetFormat());
+                    Console.Out.WriteLine("- Write:" + Path.GetFileName(DrawFile) + " = OK.");
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.Out.WriteLine("- Write:" + Path.GetFileName(DrawFile) + " = " + ex.Message);
+                }
             }
-            return true;
+            return false;
         }
 
         private ImageFormat GetFormat()
