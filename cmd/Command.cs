@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,42 @@ namespace Ots.cmd
 
     public class Command
     {
+
+        public class ExtractMap
+        {
+            public String Filename { get; set; }
+            public Map.Pos StartPos { get; set; }
+            public Map.Pos MapSize { get; set; }
+
+            public ExtractMap()
+            {
+                Filename = string.Empty;
+                StartPos = new Map.Pos();
+                MapSize = new Map.Pos() { Col = 46, Row = 30 };
+            }
+
+            public ExtractMap(ExtractMap source)
+            {
+                Filename = source.Filename;
+                StartPos = new Map.Pos(source.StartPos);
+                MapSize = new Map.Pos(source.MapSize);
+            }
+
+            public Map.Pos GetOffset()
+            {
+                var offset = new Map.Pos()
+                {
+                    Col = StartPos.Col-1,
+                    Row = StartPos.Row-1
+                };
+                return offset;
+            }
+
+            public override string ToString()
+            {
+                return string.Format("Filename={0}, Start={1}, MapSize={2}", Filename, StartPos, MapSize);
+            }
+        }
         public bool IsImport { get; set; }
         public bool IsDrawMapValues { get; set; }
         public Map.Pos OffsetPos { get; set; }
@@ -20,6 +57,9 @@ namespace Ots.cmd
         public String ImportFile { get; set; }
         public String DrawFilename { get; set; }
         public String DrawExtension { get; set; }
+
+        private readonly List<ExtractMap> _extractMaps = new List<ExtractMap>();
+        public List<ExtractMap> ExtractMaps {get { return _extractMaps; } }
 
         public Command()
         {
@@ -56,6 +96,32 @@ namespace Ots.cmd
                     canvas.Save();
                 }
             }
+            if (ExtractMaps.Count != 0)
+            {
+                using (var source = new Canvas(Filename))
+                {
+                    source.Open();
+                    if (source.IsOpen)
+                    {
+                        foreach (var extractMap in ExtractMaps)
+                        {
+                            var rect = source.GetRectangle(extractMap.StartPos, extractMap.MapSize, source.MaxSize);
+                            using (var canvas = Canvas.Clone(source, extractMap.Filename, rect))
+                            {
+                                if (canvas.Save())
+                                {
+                                    var exp = Map.Io.Read(Filename);
+                                    ResizeMap(exp, extractMap.MapSize);
+                                    if (CloneTo(exp.MapLocations, map.MapLocations, extractMap.GetOffset()))
+                                    {
+                                        Map.Io.Write(extractMap.Filename, exp);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private bool ResizeMap(Map map, Map.Pos newMax)
@@ -86,6 +152,33 @@ namespace Ots.cmd
         {
             var mapRange = NewMapRange(map, offset, filter);
             var impRange = NewMapRange(imp, new Map.Pos(), filter);
+            var mapPos = new Map.Pos();
+            var impPos = new Map.Pos();
+            var locs = 0;
+            for (mapPos.Col = mapRange.Min.Col, impPos.Col = impRange.Min.Col;
+                 mapPos.Col <= mapRange.Max.Col && impPos.Col <= impRange.Max.Col;
+                 mapPos.Col++, impPos.Col++)
+            {
+                for (mapPos.Row = mapRange.Min.Row, impPos.Row = impRange.Min.Row;
+                     mapPos.Row <= mapRange.Max.Row && impPos.Row <= impRange.Max.Row;
+                     mapPos.Row++, impPos.Row++)
+                {
+                    if (map.WithinRange(mapPos) &&
+                        imp.WithinRange(impPos))
+                    {
+                        map.Square[mapPos.Col][mapPos.Row] = new Map.Location(mapPos, imp.Square[impPos.Col][impPos.Row]);
+                        locs++;
+                    }
+                }
+            }
+            return locs != 0;
+        }
+
+
+        public bool CloneTo(Map.Locations map, Map.Locations imp, Map.Pos offset)
+        {
+            var mapRange = NewMapRange(map, new Map.Pos(), new Map.Range());
+            var impRange = NewMapRange(imp, offset, new Map.Range());
             var mapPos = new Map.Pos();
             var impPos = new Map.Pos();
             var locs = 0;

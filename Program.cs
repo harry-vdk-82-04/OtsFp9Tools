@@ -10,7 +10,7 @@ namespace Ots
 {
     class Program
     {
-        private const string Version = "1";
+        private const string Version = "1.01";
         static void Main(string[] args)
         {
             Console.Out.WriteLine("OtsFp9Tools. v" + Version);

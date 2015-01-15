@@ -48,6 +48,7 @@
     <Compile Include="cmd\Parcer.cs" />
     <Compile Include="draw\Canvas.cs" />
     <Compile Include="draw\MapValues.cs" />
+    <Compile Include="draw\Tile2Image.cs" />
     <Compile Include="fp9\Map.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
