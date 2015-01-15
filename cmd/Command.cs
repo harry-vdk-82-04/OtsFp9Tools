@@ -37,24 +37,10 @@ namespace Ots.cmd
             {
                 var offset = new Map.Pos()
                 {
-                    Col = -StartPos.Col,
-                    Row = -StartPos.Row
+                    Col = StartPos.Col-1,
+                    Row = StartPos.Row-1
                 };
                 return offset;
-            }
-
-            public Map.Range GetFilter()
-            {
-                var filter = new Map.Range
-                {
-                    Min = new Map.Pos(StartPos),
-                    Max = new Map.Pos()
-                    {
-                        Col = StartPos.Col + MapSize.Col - 1,
-                        Row = StartPos.Row + MapSize.Row - 1
-                    }
-                };
-                return filter;
             }
 
             public override string ToString()
@@ -126,9 +112,9 @@ namespace Ots.cmd
                                 {
                                     var exp = Map.Io.Read(Filename);
                                     ResizeMap(exp, extractMap.MapSize);
-                                    if (MergeFrom(exp, map, extractMap.GetOffset(), new Map.Range()))
+                                    if (CloneTo(exp.MapLocations, map.MapLocations, extractMap.GetOffset()))
                                     {
-                                        //Map.Io.Write(extractMap.Filename, exp);
+                                        Map.Io.Write(extractMap.Filename, exp);
                                     }
                                 }
                             }
@@ -166,6 +152,33 @@ namespace Ots.cmd
         {
             var mapRange = NewMapRange(map, offset, filter);
             var impRange = NewMapRange(imp, new Map.Pos(), filter);
+            var mapPos = new Map.Pos();
+            var impPos = new Map.Pos();
+            var locs = 0;
+            for (mapPos.Col = mapRange.Min.Col, impPos.Col = impRange.Min.Col;
+                 mapPos.Col <= mapRange.Max.Col && impPos.Col <= impRange.Max.Col;
+                 mapPos.Col++, impPos.Col++)
+            {
+                for (mapPos.Row = mapRange.Min.Row, impPos.Row = impRange.Min.Row;
+                     mapPos.Row <= mapRange.Max.Row && impPos.Row <= impRange.Max.Row;
+                     mapPos.Row++, impPos.Row++)
+                {
+                    if (map.WithinRange(mapPos) &&
+                        imp.WithinRange(impPos))
+                    {
+                        map.Square[mapPos.Col][mapPos.Row] = new Map.Location(mapPos, imp.Square[impPos.Col][impPos.Row]);
+                        locs++;
+                    }
+                }
+            }
+            return locs != 0;
+        }
+
+
+        public bool CloneTo(Map.Locations map, Map.Locations imp, Map.Pos offset)
+        {
+            var mapRange = NewMapRange(map, new Map.Pos(), new Map.Range());
+            var impRange = NewMapRange(imp, offset, new Map.Range());
             var mapPos = new Map.Pos();
             var impPos = new Map.Pos();
             var locs = 0;
