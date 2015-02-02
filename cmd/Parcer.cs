@@ -160,8 +160,8 @@ namespace Ots.cmd
             Console.Out.WriteLine("/ExtractMap=<extract to filename>");
             Console.Out.WriteLine("/StartCol=<int>");
             Console.Out.WriteLine("/StartRow=<int>");
-            Console.Out.WriteLine("/NrOfCols=<int>, default=46");
-            Console.Out.WriteLine("/NrOfRows=<int>, default=30");
+            Console.Out.WriteLine("/NrOfCols=<int>{default=46}");
+            Console.Out.WriteLine("/NrOfRows=<int>{default=30}");
         }
     }
 }
