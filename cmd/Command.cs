@@ -77,6 +77,7 @@ namespace Ots.cmd
         public void Run()
         {
             var map = Map.Io.Read(Filename);
+            if (map == null || map.IsOk == false) return;
             if (IsImport)
             {
                 var imp = Map.Io.Read(ImportFile);
@@ -91,9 +92,12 @@ namespace Ots.cmd
                 var text = new MapValues();
                 using (var canvas = new Canvas(Filename, DrawFilename, DrawExtension))
                 {
-                    text.DrawHexnumbers(canvas.Graphics, map);
-                    text.DrawMapValues(canvas.Graphics, map);
-                    canvas.Save();
+                    if (canvas.Graphics != null)
+                    {
+                        text.DrawHexnumbers(canvas.Graphics, map);
+                        text.DrawMapValues(canvas.Graphics, map);
+                        canvas.Save();
+                    }
                 }
             }
             if (ExtractMaps.Count != 0)

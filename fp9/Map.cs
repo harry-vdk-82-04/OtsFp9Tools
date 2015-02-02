@@ -182,24 +182,31 @@ namespace Ots.fp9
             {
                 filename = Path.ChangeExtension(filename, ".fp9");
                 var map = new Map();
-                using (var stream = File.OpenRead(filename))
+                try
                 {
-                    using (var reader = new BinaryReader(stream, Encoding.Unicode))
+                    using (var stream = File.OpenRead(filename))
                     {
-                        map.VersionId = reader.ReadInt32();
-                        if (Fp9VersionId != map.VersionId) return map;
-                        map.Name = ReadString(reader);
-                        map.MapLocations = new Locations(ReadRange(reader));
-                        map.MaxLayers = reader.ReadInt32();
-                        map.CreatorName = ReadString(reader);
-                        map.CreatorDate = ReadDateTime(reader);
-                        map.ModifiedDate = ReadDateTime(reader);
-                        map.CreatorPw = ReadString(reader);
-                        map.Description = ReadString(reader);
-                        ReadLocations(reader, map);
-                        map.IsOk = (reader.ReadInt32() == EndOfOtsMarker);
-                        Console.Out.WriteLine("- Read:"+ Path.GetFileName(filename) +" = OK.");
+                        using (var reader = new BinaryReader(stream, Encoding.Unicode))
+                        {
+                            map.VersionId = reader.ReadInt32();
+                            if (Fp9VersionId != map.VersionId) return map;
+                            map.Name = ReadString(reader);
+                            map.MapLocations = new Locations(ReadRange(reader));
+                            map.MaxLayers = reader.ReadInt32();
+                            map.CreatorName = ReadString(reader);
+                            map.CreatorDate = ReadDateTime(reader);
+                            map.ModifiedDate = ReadDateTime(reader);
+                            map.CreatorPw = ReadString(reader);
+                            map.Description = ReadString(reader);
+                            ReadLocations(reader, map);
+                            map.IsOk = (reader.ReadInt32() == EndOfOtsMarker);
+                            Console.Out.WriteLine("- Read:"+ Path.GetFileName(filename) +" = OK.");
+                        }
                     }
+                }
+                catch (Exception)
+                {
+                    Console.Out.WriteLine("- Read:" + Path.GetFileName(filename) + " = Failed.");
                 }
                 return map;
             }

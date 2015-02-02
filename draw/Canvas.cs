@@ -35,7 +35,7 @@ namespace Ots.draw
         public Canvas(String filename, String drawFilename, String drawExtension)
         {
             Filename = filename;
-            PngFile = Path.ChangeExtension(filename, drawExtension);
+            PngFile = Path.ChangeExtension(filename, ".png");
             DrawFile = (string.IsNullOrEmpty(drawFilename)
                 ? Path.ChangeExtension(filename, drawExtension)
                 : drawFilename);
