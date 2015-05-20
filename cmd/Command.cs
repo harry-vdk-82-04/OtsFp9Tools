@@ -18,6 +18,8 @@ namespace Ots.cmd
             public String Filename { get; set; }
             public Map.Pos StartPos { get; set; }
             public Map.Pos MapSize { get; set; }
+            public bool IsDrawMapValues { get; set; }
+            public bool HasFilename { get { return string.IsNullOrEmpty(Filename) == false; } }
 
             public ExtractMap()
             {
@@ -89,17 +91,9 @@ namespace Ots.cmd
             }
             if (IsDrawMapValues)
             {
-                var text = new MapValues();
-                using (var canvas = new Canvas(Filename, DrawFilename, DrawExtension))
-                {
-                    if (canvas.Graphics != null)
-                    {
-                        text.DrawHexnumbers(canvas.Graphics, map);
-                        text.DrawMapValues(canvas.Graphics, map);
-                        canvas.Save();
-                    }
-                }
+                DrawMapValues(map, Filename, DrawFilename, DrawExtension);
             }
+
             if (ExtractMaps.Count != 0)
             {
                 using (var source = new Canvas(Filename))
@@ -119,11 +113,29 @@ namespace Ots.cmd
                                     if (CloneTo(exp.MapLocations, map.MapLocations, extractMap.GetOffset()))
                                     {
                                         Map.Io.Write(extractMap.Filename, exp);
+                                        if (extractMap.IsDrawMapValues)
+                                        {
+                                            DrawMapValues(exp, extractMap.Filename, string.Empty, ".jpg");
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                }
+            }
+        }
+
+        private void DrawMapValues(Map map, String filename, String drawFilename, String drawExtension)
+        {
+            var text = new MapValues();
+            using (var canvas = new Canvas(filename, drawFilename, drawExtension))
+            {
+                if (canvas.Graphics != null)
+                {
+                    text.DrawHexnumbers(canvas.Graphics, map);
+                    text.DrawMapValues(canvas.Graphics, map);
+                    canvas.Save();
                 }
             }
         }
