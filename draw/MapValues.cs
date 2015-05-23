@@ -47,7 +47,12 @@ namespace Ots.draw
         {
             var text = string.Format("e{0},v{1},m{2}", loc.Elevation, loc.CoverRating, loc.MobilityRating);
             DrawCenterString(graphics, loc, text);
-            DrawBottomString(graphics, loc, loc.RoadCode);
+            int id;
+            int.TryParse(loc.ObstacleCode, out id);
+            text = string.Format("{0},{1}", 
+                (id != 0 ? ""+ loc.ObstacleCode : "-"),
+                (string.IsNullOrEmpty(loc.RoadCode) ? "-" : "R"));
+            DrawBottomString(graphics, loc, text);
         }
 
         private void DrawTopString(Graphics graphics, Map.Location loc, string text)
