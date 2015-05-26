@@ -18,6 +18,8 @@ namespace Ots.cmd
             public String Filename { get; set; }
             public Map.Pos StartPos { get; set; }
             public Map.Pos MapSize { get; set; }
+            public bool IsDrawMapValues { get; set; }
+            public bool HasFilename { get { return string.IsNullOrEmpty(Filename) == false; } }
 
             public ExtractMap()
             {
@@ -89,17 +91,9 @@ namespace Ots.cmd
             }
             if (IsDrawMapValues)
             {
-                var text = new MapValues();
-                using (var canvas = new Canvas(Filename, DrawFilename, DrawExtension))
-                {
-                    if (canvas.Graphics != null)
-                    {
-                        text.DrawHexnumbers(canvas.Graphics, map);
-                        text.DrawMapValues(canvas.Graphics, map);
-                        canvas.Save();
-                    }
-                }
+                DrawMapValues(map, Filename, DrawFilename, DrawExtension);
             }
+
             if (ExtractMaps.Count != 0)
             {
                 using (var source = new Canvas(Filename))
@@ -119,11 +113,29 @@ namespace Ots.cmd
                                     if (CloneTo(exp.MapLocations, map.MapLocations, extractMap.GetOffset()))
                                     {
                                         Map.Io.Write(extractMap.Filename, exp);
+                                        if (extractMap.IsDrawMapValues)
+                                        {
+                                            DrawMapValues(exp, extractMap.Filename, string.Empty, ".jpg");
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                }
+            }
+        }
+
+        private void DrawMapValues(Map map, String filename, String drawFilename, String drawExtension)
+        {
+            var text = new MapValues();
+            using (var canvas = new Canvas(filename, drawFilename, drawExtension))
+            {
+                if (canvas.Graphics != null)
+                {
+                    text.DrawHexnumbers(canvas.Graphics, map);
+                    text.DrawMapValues(canvas.Graphics, map);
+                    canvas.Save();
                 }
             }
         }
@@ -152,10 +164,10 @@ namespace Ots.cmd
             return true;
         }
 
-        public bool MergeFrom(Map.Locations map, Map.Locations imp, Map.Pos offset, Map.Range filter)
+        public bool MergeFrom(Map.Locations mapLocs, Map.Locations impLocs, Map.Pos offset, Map.Range filter)
         {
-            var mapRange = NewMapRange(map, offset, filter);
-            var impRange = NewMapRange(imp, new Map.Pos(), filter);
+            var mapRange = NewMapRange(mapLocs, offset, filter);
+            var impRange = NewMapRange(impLocs, new Map.Pos(), filter);
             var mapPos = new Map.Pos();
             var impPos = new Map.Pos();
             var locs = 0;
@@ -167,10 +179,10 @@ namespace Ots.cmd
                      mapPos.Row <= mapRange.Max.Row && impPos.Row <= impRange.Max.Row;
                      mapPos.Row++, impPos.Row++)
                 {
-                    if (map.WithinRange(mapPos) &&
-                        imp.WithinRange(impPos))
+                    if (mapLocs.WithinRange(mapPos) &&
+                        impLocs.WithinRange(impPos))
                     {
-                        map.Square[mapPos.Col][mapPos.Row] = new Map.Location(mapPos, imp.Square[impPos.Col][impPos.Row]);
+                        mapLocs.Square[mapPos.Col][mapPos.Row] = new Map.Location(mapPos, impLocs.Square[impPos.Col][impPos.Row]);
                         locs++;
                     }
                 }
@@ -178,13 +190,19 @@ namespace Ots.cmd
             return locs != 0;
         }
 
-
-        public bool CloneTo(Map.Locations map, Map.Locations imp, Map.Pos offset)
+        public bool CloneTo(Map.Locations mapLocs, Map.Locations impLocs, Map.Pos offset)
         {
-            var mapRange = NewMapRange(map, new Map.Pos(), new Map.Range());
-            var impRange = NewMapRange(imp, offset, new Map.Range());
+            var useRowShift = (IsOdd(offset.Col));
+            var mapRange = NewMapRange(mapLocs, new Map.Pos(), new Map.Range());
+            var impRange = NewMapRange(impLocs, offset, new Map.Range());
+            return Copy(mapLocs, impLocs, mapRange, impRange, useRowShift);
+        }
+
+
+        public static bool Copy(Map.Locations mapLocs, Map.Locations impLocs, Map.Range mapRange, Map.Range impRange, bool useRowShift)
+        {
             var mapPos = new Map.Pos();
-            var impPos = new Map.Pos();
+            var impPos = new Map.Pos(useRowShift);
             var locs = 0;
             for (mapPos.Col = mapRange.Min.Col, impPos.Col = impRange.Min.Col;
                  mapPos.Col <= mapRange.Max.Col && impPos.Col <= impRange.Max.Col;
@@ -194,10 +212,12 @@ namespace Ots.cmd
                      mapPos.Row <= mapRange.Max.Row && impPos.Row <= impRange.Max.Row;
                      mapPos.Row++, impPos.Row++)
                 {
-                    if (map.WithinRange(mapPos) &&
-                        imp.WithinRange(impPos))
+                    if (mapLocs.WithinRange(mapPos) &&
+                        impLocs.WithinRange(impPos))
                     {
-                        map.Square[mapPos.Col][mapPos.Row] = new Map.Location(mapPos, imp.Square[impPos.Col][impPos.Row]);
+                        var impRow = impPos.ShiftedRow;
+                        var impCol = impPos.Col;
+                        mapLocs.Square[mapPos.Col][mapPos.Row] = new Map.Location(mapPos, impLocs.Square[impCol][impRow]);
                         locs++;
                     }
                 }
@@ -214,6 +234,17 @@ namespace Ots.cmd
             range.Min.Row = Math.Max((filter.Min.Row != 0 ? filter.Min.Row : map.Min.Row) + offset.Row, map.Min.Row + offset.Row);
             range.Max.Row = Math.Min((filter.Max.Row != 0 ? filter.Max.Row : map.Max.Row) + offset.Row, map.Max.Row + offset.Row);
             return range;
+        }
+
+
+        public static bool IsOdd(int value)
+        {
+            return value % 2 != 0;
+        }
+
+        public static bool IsEven(int value)
+        {
+            return value % 2 == 0;
         }
     }
 }

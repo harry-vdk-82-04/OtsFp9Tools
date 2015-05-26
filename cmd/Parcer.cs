@@ -30,7 +30,14 @@ namespace Ots.cmd
                     switch (arg)
                     {
                         case "/drawmapvalues":
-                            command.IsDrawMapValues = true;
+                            if (string.IsNullOrEmpty(extractMap.Filename) == false)
+                            {
+                                extractMap.IsDrawMapValues = true;
+                            }
+                            else
+                            {
+                                command.IsDrawMapValues = true;
+                            }
                             break;
                     }
                 }
@@ -45,7 +52,14 @@ namespace Ots.cmd
                             command.Filename = param;
                             break;
                         case "/drawmapvalues":
-                            command.IsDrawMapValues = true;
+                            if (extractMap.HasFilename)
+                            {
+                                extractMap.IsDrawMapValues = true;
+                            }
+                            else
+                            {
+                                command.IsDrawMapValues = true;
+                            }
                             break;
                         case "/drawfilename":
                             command.DrawFilename = param;
@@ -58,7 +72,7 @@ namespace Ots.cmd
                             command.ImportFile = param;
                             break;
                         case "/extractmap":
-                            if (string.IsNullOrEmpty(extractMap.Filename) == false)
+                            if (extractMap.HasFilename)
                             {
                                 command.ExtractMaps.Add(extractMap);
                                 extractMap = new Command.ExtractMap(extractMap);
