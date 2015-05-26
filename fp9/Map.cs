@@ -17,27 +17,50 @@ namespace Ots.fp9
             public int Col { get; set; }
             public int Row { get; set; }
 
-            public Pos()
+            public int ShiftedRow
+            {
+                get
+                {
+                    return (UseRowShift && IsOdd(Col) ? Row + 1 : Row);
+                }
+            }
+
+            public bool UseRowShift { get; set; }
+
+            public Pos(bool useRowShift = false)
             {
                 Col = 0;
                 Row = 0;
+                UseRowShift = useRowShift;
             }
 
             public Pos(Pos pos)
             {
                 Col = pos.Col;
                 Row = pos.Row;
+                UseRowShift = pos.UseRowShift;
             }
 
             public Pos(int col, int row)
             {
                 Col = col;
                 Row = row;
+                UseRowShift = false;
             }
 
             public override string ToString()
             {
                 return string.Format("Col={0}, Row={1}", Col, Row);
+            }
+
+            public static bool IsOdd(int value)
+            {
+                return value % 2 != 0;
+            }
+
+            public static bool IsEven(int value)
+            {
+                return value % 2 == 0;
             }
         }
 
@@ -68,13 +91,18 @@ namespace Ots.fp9
             {
                 return pos.Col >= Min.Col
                        && pos.Col <= Max.Col
-                       && pos.Row >= Min.Row
-                       && pos.Row <= Max.Row;
+                       && pos.ShiftedRow >= Min.Row
+                       && pos.ShiftedRow <= Max.Row;
             }
 
             public override string ToString()
             {
                 return string.Format("Min={0}, Max={1}", Min, Max);
+            }
+
+            public static bool IsOdd(int value)
+            {
+                return value % 2 != 0;
             }
         }
 
