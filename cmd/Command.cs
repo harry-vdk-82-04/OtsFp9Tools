@@ -73,7 +73,7 @@ namespace Ots.cmd
             Filename = string.Empty;
             ImportFile = string.Empty;
             DrawFilename = string.Empty;
-            DrawExtension = ".png";
+            DrawExtension = ".jpeg";
         }
 
         public void Run()
@@ -115,7 +115,7 @@ namespace Ots.cmd
                                         Map.Io.Write(extractMap.Filename, exp);
                                         if (extractMap.IsDrawMapValues)
                                         {
-                                            DrawMapValues(exp, extractMap.Filename, string.Empty, ".jpg");
+                                            DrawMapValues(exp, extractMap.Filename, string.Empty, ".jpeg");
                                         }
                                     }
                                 }
