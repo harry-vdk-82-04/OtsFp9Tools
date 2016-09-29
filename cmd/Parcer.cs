@@ -39,6 +39,14 @@ namespace Ots.cmd
                                 command.IsDrawMapValues = true;
                             }
                             break;
+                        case "/createhexnumbers":
+#if DEBUG
+                            command.IsCreateHexNumbers = true;
+#endif
+                            break;
+                        case "/createelevation":
+                            command.IsCreateElevation = true;
+                            break;
                     }
                 }
                 if (split.GetLength(0) == 2)
@@ -176,6 +184,12 @@ namespace Ots.cmd
             Console.Out.WriteLine("/StartRow=<int>");
             Console.Out.WriteLine("/NrOfCols=<int>{default=46}");
             Console.Out.WriteLine("/NrOfRows=<int>{default=30}");
+            Console.Out.WriteLine("");
+            Console.Out.WriteLine("Used for qgis");
+#if DEBUG
+            Console.Out.WriteLine("/CreateHexNumbers");
+#endif
+            Console.Out.WriteLine("/CreateElevation");
         }
     }
 }

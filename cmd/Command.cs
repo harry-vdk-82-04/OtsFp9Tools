@@ -52,6 +52,8 @@ namespace Ots.cmd
         }
         public bool IsImport { get; set; }
         public bool IsDrawMapValues { get; set; }
+        public bool IsCreateHexNumbers { get; set; }
+        public bool IsCreateElevation { get; set; }
         public Map.Pos OffsetPos { get; set; }
         public Map.Range FilterRange { get; set; }
         public Map.Pos NewMax { get; set; }
@@ -73,7 +75,7 @@ namespace Ots.cmd
             Filename = string.Empty;
             ImportFile = string.Empty;
             DrawFilename = string.Empty;
-            DrawExtension = ".png";
+            DrawExtension = ".jpeg";
         }
 
         public void Run()
@@ -92,6 +94,14 @@ namespace Ots.cmd
             if (IsDrawMapValues)
             {
                 DrawMapValues(map, Filename, DrawFilename, DrawExtension);
+            }
+            if (IsCreateHexNumbers)
+            {
+                CreateHexNumbers(map, Filename);
+            }
+            if (IsCreateElevation)
+            {
+                CreateElevation(map, Filename);
             }
 
             if (ExtractMaps.Count != 0)
@@ -115,7 +125,7 @@ namespace Ots.cmd
                                         Map.Io.Write(extractMap.Filename, exp);
                                         if (extractMap.IsDrawMapValues)
                                         {
-                                            DrawMapValues(exp, extractMap.Filename, string.Empty, ".jpg");
+                                            DrawMapValues(exp, extractMap.Filename, string.Empty, ".jpeg");
                                         }
                                     }
                                 }
@@ -135,6 +145,34 @@ namespace Ots.cmd
                 {
                     text.DrawHexnumbers(canvas.Graphics, map);
                     text.DrawMapValues(canvas.Graphics, map);
+                    canvas.Save();
+                }
+            }
+        }
+
+        private void CreateHexNumbers(Map map, String filename)
+        {
+            var draw = new MapValues();
+            using (var canvas = new Canvas(filename, null, ".hexnumbers.png"))
+            {
+                if (canvas.Graphics != null)
+                {
+                    canvas.Graphics.Clear(Color.FromArgb(1, Color.Black));
+                    draw.DrawHexnumbers(canvas.Graphics, map);
+                    canvas.Save();
+                }
+            }
+        }
+
+        private void CreateElevation(Map map, String filename)
+        {
+            var draw = new MapValues();
+            using (var canvas = new Canvas(filename, null, ".elevation.png"))
+            {
+                if (canvas.Graphics != null)
+                {
+                    canvas.Graphics.Clear(Color.Black);
+                    draw.DrawElevation(canvas.Graphics, map);
                     canvas.Save();
                 }
             }
