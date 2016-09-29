@@ -12,14 +12,14 @@ namespace Ots.draw
     {
         private Font _font = new Font("Arial", 8, FontStyle.Regular);
 
-        public bool DrawHexnumbers(Graphics graphics, Map map)
+        public bool DrawHexNumbers(Graphics graphics, Map map)
         {
             var pos = new Map.Pos();
             for (pos.Col = map.MapLocations.Min.Col; pos.Col <= map.MapLocations.Max.Col; pos.Col++)
             {
                 for (pos.Row = map.MapLocations.Min.Row; pos.Row <= map.MapLocations.Max.Row; pos.Row++)
                 {
-                    DrawHexnumber(graphics, map.MapLocations.Square[pos.Col][pos.Row]);
+                    DrawHexNumber(graphics, map.MapLocations.Square[pos.Col][pos.Row]);
                 }
             }
             return true;
@@ -47,17 +47,28 @@ namespace Ots.draw
             {
                 var hexPoints = GetHexPoints(location.LocPos).ToArray();
                 graphics.FillPolygon( new SolidBrush(colors[location.Elevation]), hexPoints);
-                DrawHexnumber(graphics, location);
+                DrawHexNumber(graphics, location);
             }
             foreach (var location in map.MapLocations.GetAllLocations()
                 .Where(loc => loc.Elevation >= 2))
             {
-                DrawHexSeparations(graphics, map, location);
+                DrawHexContours(graphics, map, location);
             }
             return true;
         }
 
-        private void DrawHexSeparations(Graphics graphics, Map map, Map.Location location)
+        public bool DrawHexContours(Graphics graphics, Map map)
+        {
+            var pos = new Map.Pos();
+            foreach (var location in map.MapLocations.GetAllLocations()
+                .Where(loc => loc.Elevation >= 2))
+            {
+                DrawHexContours(graphics, map, location);
+            }
+            return true;
+        }
+
+        private void DrawHexContours(Graphics graphics, Map map, Map.Location location)
         {
             var locPos = location.LocPos;
             foreach (var neighbour in GetHexNeighbours(location.LocPos)
@@ -69,7 +80,7 @@ namespace Ots.draw
             }
         }
 
-        private void DrawHexnumber(Graphics graphics, Map.Location loc)
+        private void DrawHexNumber(Graphics graphics, Map.Location loc)
         {
             var text = string.Format("{0}.{1}", loc.LocPos.Col.ToString("D2"), loc.LocPos.Row.ToString("D2"));
             DrawTopString(graphics, loc, text);

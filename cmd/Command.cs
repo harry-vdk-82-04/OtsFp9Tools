@@ -53,6 +53,7 @@ namespace Ots.cmd
         public bool IsImport { get; set; }
         public bool IsDrawMapValues { get; set; }
         public bool IsCreateHexNumbers { get; set; }
+        public bool IsCreateHexContours { get; set; }
         public bool IsCreateElevation { get; set; }
         public Map.Pos OffsetPos { get; set; }
         public Map.Range FilterRange { get; set; }
@@ -99,6 +100,10 @@ namespace Ots.cmd
             {
                 CreateHexNumbers(map, Filename);
             }
+            if (IsCreateHexContours)
+            {
+                CreateHexContours(map, Filename);
+            }
             if (IsCreateElevation)
             {
                 CreateElevation(map, Filename);
@@ -143,7 +148,7 @@ namespace Ots.cmd
             {
                 if (canvas.Graphics != null)
                 {
-                    text.DrawHexnumbers(canvas.Graphics, map);
+                    text.DrawHexNumbers(canvas.Graphics, map);
                     text.DrawMapValues(canvas.Graphics, map);
                     canvas.Save();
                 }
@@ -158,7 +163,21 @@ namespace Ots.cmd
                 if (canvas.Graphics != null)
                 {
                     canvas.Graphics.Clear(Color.FromArgb(1, Color.Black));
-                    draw.DrawHexnumbers(canvas.Graphics, map);
+                    draw.DrawHexNumbers(canvas.Graphics, map);
+                    canvas.Save();
+                }
+            }
+        }
+
+        private void CreateHexContours(Map map, String filename)
+        {
+            var draw = new MapValues();
+            using (var canvas = new Canvas(filename, null, ".hexcontours.png"))
+            {
+                if (canvas.Graphics != null)
+                {
+                    canvas.Graphics.Clear(Color.FromArgb(0, Color.White));
+                    draw.DrawHexContours(canvas.Graphics, map);
                     canvas.Save();
                 }
             }

@@ -44,6 +44,9 @@ namespace Ots.cmd
                             command.IsCreateHexNumbers = true;
 #endif
                             break;
+                        case "/createhexcontours":
+                            command.IsCreateHexContours = true;
+                            break;
                         case "/createelevation":
                             command.IsCreateElevation = true;
                             break;
@@ -190,6 +193,7 @@ namespace Ots.cmd
             Console.Out.WriteLine("/CreateHexNumbers");
 #endif
             Console.Out.WriteLine("/CreateElevation");
+            Console.Out.WriteLine("/CreateHexContours");
         }
     }
 }
