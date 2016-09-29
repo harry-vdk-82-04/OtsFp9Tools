@@ -39,6 +39,8 @@ namespace Ots.draw
             DrawFile = (string.IsNullOrEmpty(drawFilename)
                 ? Path.ChangeExtension(filename, drawExtension)
                 : drawFilename);
+            if (Open()) return;
+            JpgFile = Path.ChangeExtension(filename, ".png");
             Open();
         }
 

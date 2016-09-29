@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -27,6 +28,14 @@ namespace Ots.fp9
 
             public bool UseRowShift { get; set; }
 
+            public bool IsRowEven => IsEven(Row);
+
+            public bool IsRowOdd => IsOdd(Row);
+
+            public bool IsColEven => IsEven(Col);
+
+            public bool IsColOdd => IsOdd(Col);
+
             public Pos(bool useRowShift = false)
             {
                 Col = 0;
@@ -34,11 +43,11 @@ namespace Ots.fp9
                 UseRowShift = useRowShift;
             }
 
-            public Pos(Pos pos)
+            public Pos(Pos pos, bool? useRowShift = null)
             {
                 Col = pos.Col;
                 Row = pos.Row;
-                UseRowShift = pos.UseRowShift;
+                UseRowShift = (bool) (useRowShift ?? pos.UseRowShift);
             }
 
             public Pos(int col, int row)
@@ -61,6 +70,19 @@ namespace Ots.fp9
             public static bool IsEven(int value)
             {
                 return value % 2 == 0;
+            }
+        }
+
+        public class Neighbours : Pos
+        {
+            public PointF Point1 { get; }
+            public PointF Point2 { get; }
+            public Color Color { get; }
+            public Neighbours(Pos pos, PointF point1, PointF point2, Color color) : base(pos)
+            {
+                Point1 = point1;
+                Point2 = point2;
+                Color = color;
             }
         }
 
@@ -180,6 +202,18 @@ namespace Ots.fp9
                     for (pos.Row = Min.Row; pos.Row <= Max.Row; pos.Row++)
                     {
                         if (Square[pos.Col][pos.Row] == null) Square[pos.Col][pos.Row] = new Location(pos);
+                    }
+                }
+            }
+
+            public IEnumerable<Location> GetAllLocations()
+            {
+                var pos = new Map.Pos();
+                for (pos.Col = Min.Col; pos.Col <= Max.Col; pos.Col++)
+                {
+                    for (pos.Row = Min.Row; pos.Row <= Max.Row; pos.Row++)
+                    {
+                        yield return Square[pos.Col][pos.Row];
                     }
                 }
             }
