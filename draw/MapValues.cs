@@ -47,7 +47,6 @@ namespace Ots.draw
             {
                 var hexPoints = GetHexPoints(location.LocPos).ToArray();
                 graphics.FillPolygon( new SolidBrush(colors[location.Elevation]), hexPoints);
-                DrawHexNumber(graphics, location);
             }
             foreach (var location in map.MapLocations.GetAllLocations()
                 .Where(loc => loc.Elevation >= 2))

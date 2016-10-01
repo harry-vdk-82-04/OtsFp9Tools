@@ -27,7 +27,7 @@ namespace Ots.cmd
                 }
                 if (split.GetLength(0) <= 1)
                 {
-                    switch (arg)
+                    switch (arg.ToLower())
                     {
                         case "/drawmapvalues":
                             if (string.IsNullOrEmpty(extractMap.Filename) == false)
@@ -43,6 +43,9 @@ namespace Ots.cmd
 #if DEBUG
                             command.IsCreateHexNumbers = true;
 #endif
+                            break;
+                        case "/drawhexnumbers":
+                            command.IsDrawHexNumbers = true;
                             break;
                         case "/createhexcontours":
                             command.IsCreateHexContours = true;
@@ -193,6 +196,7 @@ namespace Ots.cmd
             Console.Out.WriteLine("/CreateHexNumbers");
 #endif
             Console.Out.WriteLine("/CreateElevation");
+            Console.Out.WriteLine("[/DrawHexNumbers]");
             Console.Out.WriteLine("/CreateHexContours");
         }
     }

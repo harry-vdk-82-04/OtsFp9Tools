@@ -52,6 +52,7 @@ namespace Ots.cmd
         }
         public bool IsImport { get; set; }
         public bool IsDrawMapValues { get; set; }
+        public bool IsDrawHexNumbers { get; set; }
         public bool IsCreateHexNumbers { get; set; }
         public bool IsCreateHexContours { get; set; }
         public bool IsCreateElevation { get; set; }
@@ -192,6 +193,10 @@ namespace Ots.cmd
                 {
                     canvas.Graphics.Clear(Color.Black);
                     draw.DrawElevation(canvas.Graphics, map);
+                    if (IsDrawHexNumbers)
+                    {
+                        draw.DrawHexNumbers(canvas.Graphics, map);
+                    }
                     canvas.Save();
                 }
             }
