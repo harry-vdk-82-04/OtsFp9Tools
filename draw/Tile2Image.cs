@@ -53,5 +53,46 @@ namespace Ots.draw
             var point = new PointF(colX, rowY);
             return point;
         }
+
+        public IEnumerable<PointF> GetHexPoints(Map.Pos pos)
+        {
+            var center = GetCenterPoint(pos);
+            yield return new PointF(center.X - 18, center.Y - 32);
+            yield return new PointF(center.X + 18, center.Y - 32);
+            yield return new PointF(center.X + 38, center.Y);
+            yield return new PointF(center.X + 18, center.Y + 32);
+            yield return new PointF(center.X - 18, center.Y + 32);
+            yield return new PointF(center.X - 38, center.Y);
+        }
+
+        public IEnumerable<Map.Neighbours> GetHexNeighbours(Map.Pos pos)
+        {
+            var center = GetCenterPoint(pos);
+            var rowShift = pos.IsColEven ? 1 : 0;
+            yield return new Map.Neighbours(new Map.Pos(pos.Col - 1, pos.Row - 1 + rowShift),
+                                            new PointF(center.X - 38, center.Y),
+                                            new PointF(center.X - 18, center.Y - 32),
+                                            Color.FromArgb(210, 230, 210));
+            yield return new Map.Neighbours(new Map.Pos(pos.Col, pos.Row - 1), 
+                                            new PointF(center.X - 18, center.Y - 32), 
+                                            new PointF(center.X + 18, center.Y - 32),
+                                            Color.FromArgb(210, 230, 210));
+            yield return new Map.Neighbours(new Map.Pos(pos.Col + 1, pos.Row - 1 + rowShift),
+                                            new PointF(center.X + 18, center.Y - 32),
+                                            new PointF(center.X + 38, center.Y),
+                                            Color.FromArgb(210, 230, 210));
+            yield return new Map.Neighbours(new Map.Pos(pos.Col + 1, pos.Row + rowShift),
+                                            new PointF(center.X + 38, center.Y),
+                                            new PointF(center.X + 18, center.Y + 32),
+                                            Color.FromArgb(40, 60, 40));
+            yield return new Map.Neighbours(new Map.Pos(pos.Col, pos.Row + 1),
+                                            new PointF(center.X + 18, center.Y + 32),
+                                            new PointF(center.X - 18, center.Y + 32),
+                                            Color.FromArgb(40, 60, 40));
+            yield return new Map.Neighbours(new Map.Pos(pos.Col - 1, pos.Row + rowShift),
+                                            new PointF(center.X - 18, center.Y + 32),
+                                            new PointF(center.X - 38, center.Y),
+                                            Color.FromArgb(40, 60, 40));
+        }
     }
 }

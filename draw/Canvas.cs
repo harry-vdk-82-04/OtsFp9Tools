@@ -11,7 +11,7 @@ namespace Ots.draw
     public class Canvas : Tile2Image, IDisposable
     {
         public String Filename { get; set; }
-        public String PngFile { get; set; }
+        public String JpgFile { get; set; }
         public String DrawFile { get; set; }
 
         private Image _image;
@@ -28,17 +28,19 @@ namespace Ots.draw
         public Canvas(String filename)
         {
             Filename = filename;
-            PngFile = Path.ChangeExtension(filename, ".png");
-            DrawFile = Path.ChangeExtension(filename, ".png");
+            JpgFile = Path.ChangeExtension(filename, ".jpg");
+            DrawFile = Path.ChangeExtension(filename, ".jpeg");
         }
 
         public Canvas(String filename, String drawFilename, String drawExtension)
         {
             Filename = filename;
-            PngFile = Path.ChangeExtension(filename, ".png");
+            JpgFile = Path.ChangeExtension(filename, ".jpg");
             DrawFile = (string.IsNullOrEmpty(drawFilename)
                 ? Path.ChangeExtension(filename, drawExtension)
                 : drawFilename);
+            if (Open()) return;
+            JpgFile = Path.ChangeExtension(filename, ".png");
             Open();
         }
 
@@ -48,16 +50,16 @@ namespace Ots.draw
 
             try
             {
-                var fs = new FileStream(PngFile, FileMode.Open, FileAccess.Read);
+                var fs = new FileStream(JpgFile, FileMode.Open, FileAccess.Read);
                 _image = Image.FromStream(fs);
                 fs.Close();
                 _bitmap = new Bitmap(_image);
                 Graphics = Graphics.FromImage(_bitmap);
-                Console.Out.WriteLine("- Read:" + Path.GetFileName(PngFile) + " = OK.");
+                Console.Out.WriteLine("- Read:" + Path.GetFileName(JpgFile) + " = OK.");
             }
             catch(Exception ex)
             {
-                Console.Out.WriteLine("- Read:" + Path.GetFileName(PngFile) + " = " + ex.Message);
+                Console.Out.WriteLine("- Read:" + Path.GetFileName(JpgFile) + " = " + ex.Message);
             }
             return IsOpen;
         }
